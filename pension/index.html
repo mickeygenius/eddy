@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>养老有方 · 北京养老金测算</title>
+<style>
+  :root { --bg:#e9f2fb; --card:#fff; --ink:#1f2430; --sub:#4a5568; --line:#d3e0ef; --blue:#1f77b4; --green:#2ca02c; --red:#d62728; --orange:#ff7f0e; --purple:#9467bd; --navy:#1a5da8; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif; background:var(--bg); color:var(--ink); font-size:17px; line-height:1.6; }
+  header { background:linear-gradient(135deg,#2e7fd0,#1a5da8); color:#fff; padding:24px 30px; }
+  header h1 { margin:0; font-size:26px; }
+  header .sub { color:#cfe3f8; margin-top:6px; font-size:15px; }
+  main { max-width:1280px; margin:0 auto; padding:20px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(400px,1fr)); gap:16px; }
+  .card { background:var(--card); border-radius:12px; padding:20px 22px; box-shadow:0 1px 5px rgba(0,0,0,.08); }
+  .card h3 { margin:0 0 14px; font-size:20px; border-left:5px solid var(--navy); padding-left:10px; }
+  label { display:block; margin:12px 0 4px; color:#33415c; font-size:15px; font-weight:600; }
+  input, select, textarea { width:100%; padding:9px 11px; border:1px solid #c4cdd9; border-radius:8px; font-size:16px; font-family:inherit; background:#fbfcfe; color:var(--ink); }
+  input[type=checkbox] { width:auto; transform:scale(1.5); margin-right:8px; vertical-align:middle; }
+  textarea { font-family:Consolas,monospace; font-size:14px; line-height:1.5; resize:vertical; }
+  .row { display:flex; gap:12px; } .row > div { flex:1; }
+  .hint { color:#5f6b7c; font-size:13.5px; margin-top:5px; line-height:1.65; }
+  .heroGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:16px; }
+  .stat { background:var(--card); border-radius:12px; padding:16px 18px; box-shadow:0 1px 5px rgba(0,0,0,.08); }
+  .stat .v { font-size:28px; font-weight:700; color:#174e85; line-height:1.25; } .stat .v small { font-size:14px; font-weight:400; color:var(--sub); }
+  .stat .k { color:var(--sub); font-size:14px; margin-top:4px; }
+  table { border-collapse:collapse; width:100%; background:var(--card); box-shadow:0 1px 5px rgba(0,0,0,.08); border-radius:12px; overflow:hidden; }
+  #cmp { max-width:1040px; }
+  #detail { max-width:720px; }
+  th:last-child, td:last-child { padding-right:20px; }
+  th, td { padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap; font-size:15px; }
+  th { background:#ecf3fc; font-size:14px; color:#333; text-align:right; }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:center; }
+  tr.hl { background:#fff3c4; font-weight:700; }
+  tr.base td { color:#999; }
+  td.neg { color:#c00; } td.pos { color:#070; }
+  .sec { margin-top:24px; } .sec h2 { font-size:22px; margin:0 0 12px; }
+  .note { background:#fffbe8; border:1px solid #f0e2a0; border-radius:10px; padding:16px 20px; font-size:14.5px; color:#6a5b12; line-height:1.9; margin-top:16px; }
+  .tabs { display:flex; gap:10px; margin-bottom:10px; }
+  .tabs button { padding:10px 20px; border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; font-size:15px; }
+  .tabs button.on { background:var(--navy); color:#fff; border-color:var(--navy); }
+  svg { background:#fff; border-radius:12px; box-shadow:0 1px 5px rgba(0,0,0,.08); width:100%; height:auto; }
+  .legend { display:flex; flex-wrap:wrap; gap:16px; font-size:14px; margin:8px 0 0 4px; }
+  .legend span i { display:inline-block; width:20px; height:4px; margin-right:5px; vertical-align:middle; }
+  .scroll { max-height:460px; overflow:auto; width:fit-content; max-width:100%; }
+  .scroll th { position:sticky; top:0; z-index:2; box-shadow:inset 0 -1px 0 var(--line); }
+  footer { text-align:center; color:#8a94a6; font-size:13px; padding:24px; }
+  .flexrow { display:flex; gap:12px; align-items:center; } .flexrow select { flex:1; }
+  .pbtns { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-bottom:20px; }
+  .pbtn { background:#fff; border:2px solid var(--line); border-radius:12px; padding:14px 16px; cursor:pointer; text-align:left; font-family:inherit; }
+  .pbtn b { display:block; font-size:19px; margin-bottom:4px; color:#1a2b4a; }
+  .pbtn small { color:#4a5568; line-height:1.55; display:block; font-size:13.5px; }
+  .pbtn.on { border-color:#1a2b4a; background:#eef3fb; box-shadow:0 0 0 2px rgba(26,43,74,.15); }
+  .verdict { background:#eaf6ea; border:1px solid #b9dfb9; border-radius:12px; padding:14px 18px; font-size:16px; line-height:1.8; margin-bottom:14px; color:#1e4620; }
+  .fold { margin-top:20px; }
+  .fold summary { font-size:17px; font-weight:600; cursor:pointer; padding:13px 18px; background:#fff; border-radius:12px; box-shadow:0 1px 5px rgba(0,0,0,.08); color:#1a2b4a; }
+  .fold[open] > summary { margin-bottom:14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>养老有方</h1>
+  <div class="sub">心中有数，细水长流 · 填基础信息 → 选方案 → 看结果 · 纯本地运行，不上传任何数据</div>
+</header>
+<main>
+  <div class="tabs" id="pageTabs">
+    <button type="button" class="on" onclick="showPage('p1',this)">① 基础信息</button>
+    <button type="button" onclick="showPage('p2',this)">② 选方案</button>
+    <button type="button" onclick="showPage('p3',this)">③ 逐年明细</button>
+  </div>
+
+  <div id="p1">
+  <div class="cards">
+    <div class="card">
+      <h3>① 个人信息</h3>
+      <div class="row">
+        <div><label>性别</label><select id="sex"><option value="f" selected>女</option><option value="m">男</option></select></div>
+        <div><label>出生年月</label><input type="month" id="birth" value="1990-01"></div>
+      </div>
+      <label>退休身份线（按档案认定）</label>
+      <select id="line">
+        <option value="f50" selected>女·工人线（原50岁起延）</option>
+        <option value="f55">女·管理线（原55岁起延）</option>
+        <option value="m60">男（原60岁起延）</option>
+      </select>
+      <div class="row">
+        <div><label>弹性提前（月，≤36）</label><input type="number" id="flexEarly" value="0" min="0" max="36"></div>
+        <div><label>弹性延迟（月，≤36）</label><input type="number" id="flexLate" value="0" min="0" max="36"></div>
+      </div>
+      <div class="hint" id="retireInfo"></div>
+    </div>
+
+    <div class="card">
+      <h3>② 参保与缴费历史</h3>
+      <div class="row">
+        <div><label>开始缴费年月</label><input type="month" id="start" value="2015-07"></div>
+        <div><label>个人账户余额（元）</label><input type="number" id="acctBal" value="80000" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label>余额截至年月</label><input type="month" id="acctAsOf" value="2025-12"></div>
+        <div><label>中间断缴月份（每行一个，可写区间）</label><textarea id="gaps" rows="2"></textarea></div>
+      </div>
+      <label>历年缴费基数（每行：起..止 基数；cap=按3倍封顶）</label>
+      <textarea id="baseTable" rows="8">2015-07..2026-06 5000</textarea>
+      <div class="hint">在职缴费自动截止于失业起始月的前一个月。</div>
+    </div>
+
+    <div class="card">
+      <h3>③ 假设参数（一般不用改）</h3>
+      <div class="row">
+        <div><label>工资/计发基数年增速</label><input type="number" id="gWage" value="2" step="0.1"></div>
+        <div><label>个人账户记账利率</label><input type="number" id="rAcct" value="2" step="0.1"></div>
+      </div>
+      <div class="row">
+        <div><label>养老金年度调待</label><input type="number" id="gAdj" value="3" step="0.1"></div>
+        <div><label>预期寿命（岁）</label><input type="number" id="dieAge" value="85" min="60" max="100"></div>
+      </div>
+      <label>断缴期间指数处理</label>
+      <select id="zeroIdx"><option value="1" selected>按 0 计入平均（北京现行惩罚口径）</option><option value="0">剔除不计（多数省份口径）</option></select>
+      <label><input type="checkbox" id="inclEr" checked style="width:auto"> 总账参考里把公司替你缴的16%也算作投入</label>
+      <div class="hint">勾上＝对齐其他工具"总账"算法：总投入按个人8%+单位16%合计计算，它们说"养老金收益只有约5%"就是这么来的——把单位缴的钱记在了你头上。不勾＝只算个人工资实际扣的8%，收益率明显更高。这只影响"总账年化收益(参考)"一张卡，对续缴决策毫无影响——灵活就业阶段没有单位缴费。</div>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h3>④ 高级：社平工资表 / 计发基数表（每行"年份: 值"，可修正）</h3>
+      <div class="row">
+        <div><label>历年社平月工资（指数分母、封顶基数来源；未来年份按增速外推）</label>
+        <textarea id="socTable" rows="6">2003: 2409
+2004: 2734
+2005: 3008
+2006: 3322
+2007: 3726
+2008: 3726
+2009: 4037
+2010: 4201
+2011: 4672
+2012: 5223
+2013: 5793
+2014: 6463
+2015: 7086
+2016: 7706
+2017: 8467
+2018: 8847
+2019: 8847
+2020: 9407
+2021: 10628
+2022: 11297
+2023: 11761
+2024: 11937
+2025: 12116</textarea></div>
+        <div><label>历年养老金计发基数（2026年尚未发布，外推）</label>
+        <textarea id="cbTable" rows="6">2020: 9910
+2021: 10534
+2022: 11082
+2023: 11525
+2024: 11883
+2025: 12049</textarea></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px;padding:14px 16px">
+    <div class="flexrow">
+      <button type="button" id="saveProfile" style="width:auto">保存我的档案（下载文件）</button>
+      <button type="button" id="loadProfileBtn" style="width:auto">载入档案文件</button>
+      <button type="button" id="resetBtn" style="width:auto">恢复默认（清空重填）</button>
+      <input type="file" id="loadFile" accept=".json,application/json" style="display:none">
+    </div>
+    <div class="hint">改动会自动记在本机浏览器里，下次打开自动恢复。档案文件只含你填的数字，可以发微信、传手机、存网盘——谁载入就是谁的，数据不上传。</div>
+  </div>
+
+  </div>
+
+  <div id="p2" style="display:none">
+  <div class="hint" style="font-size:14px;margin:0 0 12px">两条路自由搭配：转不转灵活就业、缴不缴费、缴哪一档、4050要不要——改任何一项，下面的结果立刻跟着变。</div>
+
+  <div class="card">
+    <h3>你的养老方案（自由搭配）</h3>
+    <label>失业后走哪条路</label>
+    <select id="pathMode">
+      <option value="flex4050" selected>路径① 转灵活就业：失业金期缴养老 → 之后续缴（可享4050）</option>
+      <option value="pure">路径② 只领失业金：不办灵活就业、不再缴费（4050放弃）</option>
+    </select>
+    <div class="hint" id="pathHint"></div>
+    <div class="row">
+      <div><label>失业起始年月</label><input type="month" id="unemp" value="2026-07"></div>
+      <div><label>失业金领取月数</label><input type="number" id="unempDur" value="24" min="0" max="36"></div>
+    </div>
+    <div id="flex4050Box">
+      <div class="row">
+        <div><label>失业金期间缴费档位</label>
+          <select id="tierA"><option value="0">不缴</option><option value="0.6" selected>60%（下限）</option><option value="1">100%</option><option value="3">300%（封顶）</option></select>
+        </div>
+        <div><label>4050期间缴费档位</label>
+          <select id="tierB"><option value="0">不缴</option><option value="0.6" selected>60%（下限）</option><option value="1">100%</option><option value="3">300%（封顶）</option></select>
+        </div>
+      </div>
+      <label>4050补贴核定方式（已按北京现行政策核实，2025-11）</label>
+      <select id="subsidyMode">
+        <option value="fixed" selected>北京现行：按缴费基数下限定额核定（补贴不随档位变）</option>
+        <option value="byBase">对比假设：按本人缴费基数×14%（非北京现行，仅供对比）</option>
+      </select>
+      <label>4050申请时点（期限：一般最长36个月；距法定退休不足5年申请可延至法定退休，补贴≤60个月）</label>
+      <select id="applyMode">
+        <option value="atFlex" selected>失业金结束后立即申请（2029-07起，补贴36个月封顶）</option>
+        <option value="delayed">延迟至距法定退休不足5年时申请（补贴延至法定退休）</option>
+      </select>
+      <label><input type="checkbox" id="subsidy" checked style="width:auto"> 享受4050社保补贴</label>
+      <div class="hint">现行规则：养老缴20%补14pp（个人6%）、医保缴7%补6pp（个人1%）、失业缴1.2%补1pp；2025年三险月缴1882.02元、补贴1254.68元、个人实付627.34元（≈最低缴费的2/3）。</div>
+      <div class="hint">结果实时显示在本页下方；16 种档位组合对比在“③ 逐年明细”页。</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>该方案结果</h2>
+    <div class="heroGrid" id="hero"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="note" id="caliberNote"></div>
+  </div>
+  </div>
+
+  <div id="p3" style="display:none">
+
+  <div class="sec" id="cmpSec">
+    <h2>16 种档位组合对比</h2>
+    <div class="scroll"><table id="cmp"></table></div>
+  </div>
+
+  <div class="sec" id="chartSec">
+    <h2>累计净现金流</h2>
+    <div class="tabs">
+      <button id="tabDelta" class="on" onclick="setMode('delta')">增量口径：只算失业→退休的投入（推荐视角）</button>
+      <button id="tabLife" onclick="setMode('life')">参考：2004年起总账（含在职投入）</button>
+    </div>
+    <svg id="chart" viewBox="0 0 980 380"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="sec">
+    <h2>逐年明细</h2>
+    <div class="flexrow"><select id="detailSel"></select></div>
+    <div class="scroll"><table id="detail"></table></div>
+  </div>
+  </div>
+
+  <div class="note">
+    <b>口径与免责</b>：① 平均指数分母 = 参保首月至退休当月全部月数，断缴月按上方口径处理；② 计发月数按整岁表（50岁=195、55岁=170、58岁=152）；③ 社平历史值为近似，请与社保对账单上的 Z实指数 核对后修正；④ 2026年养老金计发基数尚未发布（截至2026-11），按增速外推；⑤ <b>4050补贴已按北京现行政策建模（2025-11核实）</b>：按缴费基数下限定额核定（养老补14个百分点，2025年三险个人实付627.34元/月），期限36个月封顶、距法定退休不足5年申请可延至法定退休（补贴≤60个月）；"核定方式"中的"按本人基数×14%"仅为对比假设；⑥ <b>2026-11-01起北京规范女性灵活就业退休年龄（财新2026-11-16报道；官方文件尚未挂网、无文号）</b>：网传口径——2024-12-31前已有灵活就业参保记录者仍按50岁线（每2个月延1个月，2036年并轨55），此后新参保及无记录者按55线（每4个月延1个月）；"过渡条件"存在多个版本、未经官方证实。路径②（只领失业金、不办灵活就业）退休时按职工档案50线认定还是按55线、领失业金期间以个人身份缴养老（北京明文不停发失业金）会否改变身份认定，均以12333/经办窗口书面答复为准；退休审核按 f50 还是 f55 线（档案管理岗 vs 实际岗位变更记载）以档案存放地记载为准；⑦ 本工具为个人估算，非官方核算，退休金额以社保经办机构核定为准。
+  </div>
+</main>
+<footer>养老有方 · 纯前端本地计算 · 双击即用 · 数据不出你的电脑</footer>
+
+<script>
+"use strict";
+// ================= 引擎（已用 Node 独立验证） =================
+const ym=(y,m)=>y*12+(m-1), ymOf=i=>[Math.floor(i/12),(i%12)+1];
+const ymStr=i=>{const[y,m]=ymOf(i);return y+"-"+String(m).padStart(2,"0");};
+let SOC={}, CB={};
+function socWage(y,g){return SOC[y]!=null?SOC[y]:12116*Math.pow(1+g,y-2025);}
+function denom(i,g){const[y,m]=ymOf(i);const s=m>=7?y:y-1;return socWage(s-1,g);}
+function calcBase(y,g){return CB[y]!=null?CB[y]:12049*Math.pow(1+g,y-2025);}
+const FACTOR={40:233,41:230,42:226,43:223,44:220,45:216,46:212,47:208,48:204,49:199,50:195,51:190,52:185,53:180,54:175,55:170,56:164,57:158,58:152,59:145,60:139,61:132,62:125,63:117,64:109,65:101,66:93,67:84,68:75,69:65,70:56};
+function statRetireAgeM(bY,bM,line){
+  const c=line==="f50"?{y:1975,m:1,base:600,per:2,cap:60}:line==="f55"?{y:1970,m:1,base:660,per:4,cap:36}:{y:1965,m:1,base:720,per:4,cap:36};
+  const d=(bY-c.y)*12+(bM-c.m);
+  return d<0?c.base:c.base+Math.min(c.cap,Math.floor(d/c.per)+1);
+}
+function parseBaseTable(t){const s=[];t.split(/\n+/).forEach(l=>{const x=l.trim();if(!x)return;
+  let m=x.match(/^(\d{4})-(\d{1,2})\s*(?:\.\.|~|至|-)\s*(\d{4})-(\d{1,2})\s+([\d.,]+|cap|封顶)$/i)||x.match(/^(\d{4})-(\d{1,2})\s+([\d.,]+|cap|封顶)$/i);
+  if(!m)return;
+  if(m.length===6)s.push({a:ym(+m[1],+m[2]),b:ym(+m[3],+m[4]),v:m[5].toLowerCase()});
+  else s.push({a:ym(+m[1],+m[2]),b:ym(+m[1],+m[2]),v:m[3].toLowerCase()});});return s;}
+function parseMonths(t){const o=[];t.split(/[\s,;，；\n]+/).forEach(x=>{x=x.trim();if(!x)return;
+  let m=x.match(/^(\d{4})-(\d{1,2})\s*(?:\.\.|~|至|-)\s*(\d{4})-(\d{1,2})$/);
+  if(m){const a=ym(+m[1],+m[2]),b=ym(+m[3],+m[4]);for(let i=a;i<=b;i++)o.push(i);return;}
+  m=x.match(/^(\d{4})-(\d{1,2})$/);if(m)o.push(ym(+m[1],+m[2]));});return o;}
+function parseKV(t){const o={};t.split(/\n+/).forEach(l=>{const m=l.trim().match(/^(\d{4})\s*[:：]\s*([\d.,]+)$/);if(m)o[+m[1]]=parseFloat(m[2].replace(/,/g,""));});return o;}
+function xirr(fl){ if(!fl.length) return NaN;
+  const d0=fl.reduce((mn,f)=>f.d<mn?f.d:mn,fl[0].d);
+  const npv=r=>fl.reduce((s,f)=>s+f.a/Math.pow(1+r,(f.d-d0)/864e5/365),0);
+  let lo=-0.95,hi=50,flo=npv(lo),fhi=npv(hi);
+  if(flo*fhi>0)return NaN;
+  for(let k=0;k<200;k++){const mid=(lo+hi)/2,fm=npv(mid);
+    if(Math.abs(fm)<1e-9)return mid;
+    if(flo*fm<=0){hi=mid;fhi=fm;}else{lo=mid;flo=fm;}}
+  return (lo+hi)/2;}
+
+function buildModel(p){
+  const legalAgeM=statRetireAgeM(p.birthY,p.birthM,p.line);
+  const birthIdx=ym(p.birthY,p.birthM);
+  const statIdx=birthIdx+legalAgeM;
+  const retireAgeM=legalAgeM-p.flexEarly+p.flexLate;
+  const retireIdx=birthIdx+retireAgeM;
+  const g=p.gWage, n=retireIdx-p.startIdx+1;
+  const gaps=new Set(p.gapMonths);
+  const unempEnd=p.unempIdx+p.unempDur-1;
+  const applyIdx=p.applyMode==="delayed"?Math.max(unempEnd+1,statIdx-59):unempEnd+1;
+  const subEnd=(statIdx-applyIdx<60)?statIdx:applyIdx+36;
+  const months=[];
+  for(let i=0;i<n;i++){const idx=p.startIdx+i,[y,m]=ymOf(idx);
+    const r={idx,y,m,pay:false,base:0,kind:"",personalRate:0};
+    if(idx<p.unempIdx){
+      if(!gaps.has(idx)){const seg=p.segs.find(s=>idx>=s.a&&idx<=s.b);
+        if(seg){let v;if(seg.v==="cap"||seg.v==="封顶")v=denom(idx,g)*3;else v=Math.min(parseFloat(seg.v),denom(idx,g)*3);
+          r.pay=true;r.base=v;r.kind="job";}}
+    }else if(idx<=unempEnd){
+      if(p.tierA>0){r.pay=true;r.base=denom(idx,g)*p.tierA;r.kind="unemp";r.personalRate=0.20;}
+    }else{
+      if(p.tierB>0){r.pay=true;r.base=denom(idx,g)*p.tierB;r.kind="flex";
+        const sub=p.subsidy4050&&idx>=applyIdx&&idx<subEnd;
+        r.personalRate=sub?(p.subsidyMode==="fixed"?(0.20-0.084/p.tierB):0.06):0.20;}
+    }
+    months.push(r);}
+  let bal=p.acctBal;
+  months.forEach(r=>{if(r.idx>p.acctAsOfIdx){bal*=1+p.rAcct/12;if(r.pay)bal+=r.base*0.08;r.bal=bal;}else r.bal=(r.idx===p.acctAsOfIdx?p.acctBal:null);});
+  let idxSum=0,denomM=0,paidM=0;
+  months.forEach(r=>{denomM++;
+    if(r.pay){idxSum+=Math.min(r.base/denom(r.idx,g),3);paidM++;}
+    else if(!p.zeroIdx)denomM--;});
+  const avgIdx=denomM>0?idxSum/denomM:0, years=paidM/12;
+  const ry=ymOf(retireIdx)[0], cb=calcBase(ry-1,g);
+  const basicP=cb*(1+avgIdx)/2*years*0.01;
+  const fl=FACTOR[Math.min(70,Math.max(40,Math.floor(retireAgeM/12)))];
+  const acctP=bal/fl, pension=basicP+acctP;
+  const flexCost=months.reduce((s,r)=>s+(r.pay&&r.kind!=="job"?r.base*r.personalRate:0),0);
+  const lifeCost=months.reduce((s,r)=>s+(r.pay?r.base*(r.kind==="job"?(p.inclEr?0.24:0.08):r.personalRate):0),0);
+  return {months,retireIdx,retireAgeM,bal,avgIdx,years,paidM,denomM,cb,basicP,acctP,pension,factor:fl,flexCost,lifeCost};
+}
+function adjFactor(p,mod,y){return Math.pow(1+p.gAdj,Math.max(0,y-ymOf(mod.retireIdx)[0]));}
+function flowsDelta(p,mA,mB){
+  const fl=[];const dP=mB.pension-mA.pension;
+  if(Math.abs(dP)<0.005&&!mB.flexCost)return fl;
+  mB.months.forEach(r=>{if(r.pay&&r.kind!=="job")fl.push({d:new Date(r.y,r.m-1,1),a:-r.base*r.personalRate});});
+  const dieIdx=ym(p.birthY,p.birthM)+Math.round(p.dieAge*12);
+  for(let i=mB.retireIdx+1;i<=dieIdx;i++){const[y,m]=ymOf(i);
+    fl.push({d:new Date(y,m-1,1),a:dP*adjFactor(p,mB,y)});}
+  return fl;}
+function flowsLife(p,m){
+  const fl=[];
+  m.months.forEach(r=>{if(r.pay)fl.push({d:new Date(r.y,r.m-1,1),a:-(r.kind==="job"?(p.inclEr?0.24:0.08):r.personalRate)*r.base});});
+  const dieIdx=ym(p.birthY,p.birthM)+Math.round(p.dieAge*12);
+  for(let i=m.retireIdx+1;i<=dieIdx;i++){const[y,m2]=ymOf(i);
+    fl.push({d:new Date(y,m2-1,1),a:m.pension*adjFactor(p,m,y)});}
+  return fl;}
+function breakeven(p,fromAgeM,cost,monthly0,g){
+  if(monthly0<=0||cost<=0)return null;
+  let cum=0,k=0;
+  while(cum<cost&&k<1200){cum+=monthly0*Math.pow(1+g,Math.floor(k/12));k++;}
+  return {months:k,age:(fromAgeM+k)/12};}
+
+// ================= UI =================
+const TIERS=[0,0.6,1,3];
+const COLORS={"0,0":"#999","0.6,0.6":"#1f77b4","1,1":"#9467bd","3,3":"#ff7f0e","0.6,3":"#d62728","0.6,1":"#2ca02c"};
+const NAMES={"0":"不缴","0.6":"60%","1":"100%","3":"300%"};
+let MODE="delta", LAST=null;
+const $=id=>document.getElementById(id);
+function setDisp(id,on){const e=$(id);if(e&&e.style)e.style.display=on?"":"none";}
+function setDim(id,d){const e=$(id);if(e&&e.style)e.style.opacity=d?"0.45":"1";}
+const fmtW=v=>(v/10000).toFixed(1);
+const fmtPct=v=>isNaN(v)?"—":(v*100).toFixed(1)+"%";
+function mval(id,def){const v=$(id).value;if(/^\d{4}-\d{1,2}$/.test(v.trim())){const[a,b]=v.trim().split("-").map(Number);return ym(a,b);}return def;}
+function readP(){
+  const bv=$("birth").value.split("-");
+  const b=(bv.length===2&&/^\d{4}$/.test(bv[0])&&/^\d{1,2}$/.test(bv[1]))?[+bv[0],+bv[1]]:[1990,1];
+  const pure=$("pathMode").value==="pure";
+  return {
+    sex:$("sex").value, birthY:b[0], birthM:b[1], line:$("line").value,
+    flexEarly:Math.max(0,Math.min(36,+$("flexEarly").value||0)),
+    flexLate:Math.max(0,Math.min(36,+$("flexLate").value||0)),
+    startIdx:mval("start",ym(2004,7)),
+    gapMonths:parseMonths($("gaps").value),
+    segs:parseBaseTable($("baseTable").value),
+    unempIdx:mval("unemp",ym(2027,7)),
+    unempDur:Math.max(0,Math.min(60,+$("unempDur").value||0)),
+    tierA:pure?0:+$("tierA").value, tierB:pure?0:+$("tierB").value,
+    subsidy4050:!pure&&$("subsidy").checked, subsidyMode:$("subsidyMode").value, applyMode:$("applyMode").value,
+    pathMode:pure?"pure":"flex4050",
+    gWage:(+$("gWage").value||0)/100, rAcct:(+$("rAcct").value||0)/100,
+    gAdj:(+$("gAdj").value||0)/100, dieAge:Math.max(50,Math.min(100,+$("dieAge").value||85)),
+    zeroIdx:$("zeroIdx").value==="1", inclEr:$("inclEr").checked,
+    acctBal:+$("acctBal").value||0, acctAsOfIdx:mval("acctAsOf",ym(2025,12)),
+    soc:parseKV($("socTable").value), cbT:parseKV($("cbTable").value)
+  };
+}
+function recalc(){
+  const p=readP();
+  SOC=Object.assign(SOC,p.soc); CB=Object.assign(CB,p.cbT);
+  const legalM=statRetireAgeM(p.birthY,p.birthM,p.line);
+  const retireM=legalM-p.flexEarly+p.flexLate;
+  const bIdx=ym(p.birthY,p.birthM);
+  $("retireInfo").textContent="法定退休：法定年龄 "+(legalM/12).toFixed(1)+" 岁（"+ymStr(bIdx+legalM)+"）→ 实际退休 "+(retireM/12).toFixed(1)+" 岁（"+ymStr(bIdx+retireM)+"）";
+  const baseMod=buildModel({...p,tierA:0,tierB:0});
+  const rows=[];
+  TIERS.forEach(a=>TIERS.forEach(b=>{
+    const mod=buildModel({...p,tierA:a,tierB:b});
+    const dx=xirr(flowsDelta(p,baseMod,mod));
+    const lx=xirr(flowsLife(p,mod));
+    const beD=breakeven(p,mod.retireAgeM,mod.flexCost,mod.pension-baseMod.pension,p.gAdj);
+    const beL=breakeven(p,mod.retireAgeM,mod.lifeCost,mod.pension,p.gAdj);
+    rows.push({a,b,mod,dx,lx,beD,beL});
+  }));
+  const sel=rows.find(r=>r.a===p.tierA&&r.b===p.tierB);
+  const pure=p.pathMode==="pure";
+  let altMod=null;
+  if(pure)altMod=buildModel({...p,tierA:0.6,tierB:0,subsidy4050:false});
+  if(pure&&MODE==="delta"){MODE="life";$("tabDelta").className="";$("tabLife").className="on";}
+  setDisp("flex4050Box",!pure);
+  setDisp("cmpSec",!pure);
+  setDisp("chartSec",!pure);
+  setDim("tabDelta",pure);
+  $("pathHint").textContent=pure
+    ?"全程只领失业金：医保由失业保险基金代缴、个人不掏钱；养老不缴＝不产生任何灵活就业参保记录，4050一并放弃。目的：退休认定时保持“失业职工”身份、按职工档案（工人岗）走50线。断缴月按0计入平均指数（北京口径）。"
+    :"此路径会产生灵活就业参保记录——2026-11北京新规网传口径下，2024年底前无灵活就业记录者走此路可能按55线认定；确认自己属于“过渡人”后再选。领失业金期间缴养老不停发失业金（北京明文）。";
+  LAST={p,baseMod,rows,sel,altMod};
+  renderHero(p,sel,baseMod);
+  renderTable(p,rows);
+  renderChart();
+  renderDetailSel();
+  renderDetail();
+}
+function renderHero(p,sel,base){
+  const m=sel.mod, pure=p.pathMode==="pure", ry=ymOf(m.retireIdx)[0];
+  const delta=sel.mod.pension-base.pension;
+  const alt=LAST.altMod;
+  const legalM=m.retireAgeM+p.flexEarly-p.flexLate;
+  const retCard=["退休",ymStr(m.retireIdx),"<small>"+(m.retireAgeM/12).toFixed(1)+" 岁 · 法定 "+(legalM/12).toFixed(1)+" 岁 · 弹性提前 "+p.flexEarly+" 个月</small>"];
+  const cards=pure?[
+    retCard,
+    ["月养老金",m.pension.toFixed(0),"<small>元/月（"+ry+"年价）· 基础 "+m.basicP.toFixed(0)+" + 账户 "+m.acctP.toFixed(0)+"</small>"],
+    ["失业后投入","0 元","<small>只领失业金 · 不办灵活就业 · 4050放弃</small>"],
+    ["若失业金期自缴60%",alt.pension.toFixed(0),"<small>元/月 · 多掏 "+fmtW(alt.flexCost)+" 万换 +"+(alt.pension-m.pension).toFixed(0)+" 元/月 · 年化 "+fmtPct(xirr(flowsDelta(p,m,alt)))+" · 会留灵活就业记录（55线风险）</small>"],
+    ["缴费水平",m.avgIdx.toFixed(2),"<small>倍社平 · 分母 "+m.denomM+" 个月（断缴按0计入）</small>"],
+    ["缴费年限",m.years.toFixed(2),"<small>年（实缴 "+m.paidM+" 个月）</small>"],
+    ["退休时账户",fmtW(m.bal),"<small>万元 · ÷"+m.factor+" 个月发放</small>"],
+    ["总账年化收益(参考)",fmtPct(sel.lx),"<small>含在职22年总账 · 非决策口径</small>"]
+  ]:[
+    retCard,
+    ["月养老金",m.pension.toFixed(0),"<small>元/月（"+ry+"年价）· 基础 "+m.basicP.toFixed(0)+" + 账户 "+m.acctP.toFixed(0)+"</small>"],
+    ["较全程不缴 +",delta.toFixed(0),"<small>元/月 · 终身领取并随调待增长</small>"],
+    ["失业后总投入",fmtW(m.flexCost),"<small>万元（失业起→退休，个人实付）</small>"],
+    ["这笔钱的年化收益",fmtPct(sel.dx),"<small>增量XIRR · 投入 vs 养老金增量 · 活到 "+p.dieAge+" 岁</small>"],
+    ["几年回本",sel.beD?sel.beD.age.toFixed(1)+" 岁":"—","<small>退休后 "+(sel.beD?sel.beD.months:"—")+" 个月追回投入</small>"],
+    ["缴费水平 / 年限",m.avgIdx.toFixed(2)+" / "+m.years.toFixed(1),"<small>倍社平 · 实缴 "+m.paidM+" 个月</small>"],
+    ["退休时账户",fmtW(m.bal),"<small>万元 · ÷"+m.factor+" 个月发放</small>"],
+    ["总账年化收益(参考)",fmtPct(sel.lx),"<small>含在职22年总账 · 非决策口径</small>"]
+  ];
+  $("hero").innerHTML=cards.map(c=>'<div class="stat"><div class="v">'+c[1]+" "+(c[2]||"")+'</div><div class="k">'+c[0]+"</div></div>").join("");
+  const jobEnd=ymStr(p.unempIdx-1);
+  const verdict=pure
+    ?"<b>一句话：</b>干到 "+jobEnd+"，之后只领失业金（医保由失业保险基金代缴，个人不掏钱），"+ymStr(m.retireIdx)+" 退休。全程不再缴一分钱，月领约 "+m.pension.toFixed(0)+" 元。唯一悬念：最终按哪条退休线认定，请以社保经办窗口的书面答复为准。"
+    :(p.line==="f55"
+      ?"<b>一句话：</b>55线情形——干到 "+jobEnd+"，"+ymStr(m.retireIdx)+" 退休，月领约 "+m.pension.toFixed(0)+" 元：多干这几年，每月多领一大截。"
+      :"<b>一句话：</b>"+jobEnd+" 失业后转灵活就业缴"+Math.round(p.tierA*100)+"%并申请4050，"+ymStr(m.retireIdx)+" 退休，月领约 "+m.pension.toFixed(0)+" 元，合计再掏 "+fmtW(m.flexCost)+" 万。注意：此路会留灵活就业记录，新规下可能被按55线认定——确认属于“过渡人”再走。");
+  $("verdict").innerHTML=verdict;
+  $("caliberNote").innerHTML="<b>口径说明（增量口径：只算失业→退休的投入）</b><br>"+
+    "· 下方全部指标均为<b>增量口径</b>：以“全程不缴”为基准，投入=失业起始月至退休当月的个人实付，产出=由此带来的养老金<b>差额</b>（终身领取+每年调待）。在职期间的缴费和产出在基准与方案中完全相同、相减抵消，不掺入在职期间的任何数字。<br>"+
+    "· “全周期XIRR”仅为回应其他工具“总账约5%”的参考值（自参保起、含单位缴费的总投入 vs 总领取），与续缴决策无关。<br>"+
+    "· <b>4050补贴（已按北京现行政策核实，2025-11）</b>：补贴按<b>缴费基数下限</b>定额核定——养老按20%缴、政府补14个百分点（个人付6%），补贴额固定（2026年约1,018元/月），<b>不随所选档位放大</b>；2025年三险合计月缴1,882.02元、补贴1,254.68元、个人实付627.34元（≈最低缴费的2/3）。因此4050期升100%/300%档时个人月付约1,500/6,300元，升档的边际XIRR只有约6%——“4050期交高档太多”的直觉在现行政策下成立。期限：一般最长36个月；距<b>法定退休年龄</b>不足5年时申请的，可延长至法定退休（补贴最长60个月；法定时点见顶部“法定退休”实时提示）。用“4050申请时点”对比两种策略。<br>"+
+    "· <b>路径②（只领失业金）与2026-11北京新规</b>：北京自2026-11-01规范女性灵活就业退休年龄（财新2026-11-16报道，官方文件未挂网）——网传过渡条件只保护2024年底前已有灵活就业参保记录者；路径②全程不产生该记录，旨在让退休认定退回职工档案（工人岗）50线。成不成，取决于经办窗口对“无业+零记录退休按哪条线”的书面答复。选“路径②”后指标卡会给出“失业金期自缴”的对照数字——能缴≠该缴：多缴的钱换不来退休日期，却可能坐实55线。<br>"+
+    "· <b>退休线（两种情形）</b>：非管理岗(f50线)与档案管理岗(f55线)的法定退休年龄由出生年月决定，顶部“法定退休”一行实时显示所选线的法定时点和弹性提前后的实际退休时点。按哪条线退取决于退休审核时<b>档案记载的岗位</b>——想按非管理岗办，岗位变更需在档案中有相应记载，务必提前与档案存放地（人才中心/存档机构）确认。切换“身份线”即可对比。<br>"+
+    "· 当前假设：调待 "+(p.gAdj*100).toFixed(1)+"%、工资增速 "+(p.gWage*100).toFixed(1)+"%、记账利率 "+(p.rAcct*100).toFixed(1)+"%、活到 "+p.dieAge+" 岁。";
+}
+function renderTable(p,rows){
+  const head="<tr><th>失业金期</th><th>4050期</th><th>月养老金(元)</th><th>较全程不缴 +(元/月)</th><th>平均指数</th><th>灵活就业投入(万)</th><th>增量XIRR</th><th>增量打平(岁)</th><th>全周期XIRR(参考)</th><th>全周期打平(岁)</th></tr>";
+  const sorted=[...rows].sort((x,y)=>y.mod.pension-x.mod.pension);
+  const base=LAST.baseMod;
+  const body=sorted.map(r=>{
+    const isBase=r.a===0&&r.b===0, isSel=r.a===LAST.p.tierA&&r.b===LAST.p.tierB;
+    const cls=(isBase?"base":"")+(isSel?" hl":"");
+    const nm=a=>a===0?"不缴":(a*100)+"%";
+    return "<tr class='"+cls+"'><td>"+nm(r.a)+"</td><td>"+nm(r.b)+"</td><td>"+r.mod.pension.toFixed(0)+"</td><td class='pos'>+"+(r.mod.pension-base.pension).toFixed(0)+"</td><td>"+r.mod.avgIdx.toFixed(2)+"</td><td>"+fmtW(r.mod.flexCost)+"</td><td class='"+(isNaN(r.dx)?"":"pos")+"'>"+(isBase?"基准":fmtPct(r.dx))+"</td><td>"+(r.beD?r.beD.age.toFixed(1):"—")+"</td><td class='"+(isNaN(r.lx)?"":"pos")+"'>"+fmtPct(r.lx)+"</td><td>"+(r.beL?r.beL.age.toFixed(1):"—")+"</td></tr>";
+  }).join("");
+  $("cmp").innerHTML=head+body;
+}
+function cumSeries(p,mod,mode,base){
+  const bIdx=ym(p.birthY,p.birthM);
+  const dieIdx=bIdx+Math.round(p.dieAge*12);
+  const from=mode==="delta"?p.unempIdx:p.startIdx;
+  let c=0,rec=0;const out=[];
+  for(let i=from;i<=dieIdx;i++){
+    const r=mod.months.find(x=>x.idx===i);
+    if(r&&r.pay)c+=mode==="delta"?(r.kind!=="job"?r.base*r.personalRate:0):r.base*(r.kind==="job"?(p.inclEr?0.24:0.08):r.personalRate);
+    if(i>mod.retireIdx){const y=ymOf(i)[0];rec+=(mode==="delta"?mod.pension-base.pension:mod.pension)*adjFactor(p,mod,y);}
+    out.push([(i-bIdx)/12,rec-c]);
+  }
+  return out;
+}
+function renderChart(){
+  const {p,baseMod,rows,sel}=LAST;
+  const svg=$("chart");const W=980,H=380,ml=70,mr=20,mt=16,mb=34;
+  const series=[];
+  const pick={"0,0":baseMod,"0.6,0.6":null,"0.6,1":null,"1,1":null,"0.6,3":null,"3,3":null};
+  rows.forEach(r=>{const k=r.a+","+r.b;if(k in pick)pick[k]=r.mod;});
+  const show=[["0,0","#999","基准：全程不缴"],["0.6,0.6","#1f77b4","60% / 60%"],["0.6,1","#2ca02c","60% / 100%"],["0.6,3","#d62728","60% / 300%（混合）"],["3,3","#ff7f0e","300% / 300%"]];
+  let all=[];
+  show.forEach(([k,c,n])=>{const mod=k==="0,0"?baseMod:pick[k];all=all.concat(cumSeries(p,mod,MODE,baseMod));});
+  all=all.concat(cumSeries(p,sel.mod,MODE,baseMod));
+  const xs=all.map(d=>d[0]),ys=all.map(d=>d[1]);
+  const x0=Math.min(...xs),x1=Math.max(...xs);
+  let y0=Math.min(0,...ys),y1=Math.max(0,...ys);
+  const pad=(y1-y0)*0.08||1;y0-=pad;y1+=pad;
+  const X=v=>ml+(v-x0)/(x1-x0)*(W-ml-mr);
+  const Y=v=>mt+(1-(v-y0)/(y1-y0))*(H-mt-mb);
+  let g="";
+  const ty=Math.abs(y1-y0)>4?1:0;
+  for(let i=0;i<=6;i++){const v=y0+(y1-y0)*i/6;g+='<line x1="'+ml+'" y1="'+Y(v)+'" x2="'+(W-mr)+'" y2="'+Y(v)+'" stroke="#eef0f3"/><text x="'+(ml-6)+'" y="'+(Y(v)+4)+'" font-size="12" fill="#888" text-anchor="end">'+(v/10000).toFixed(ty)+"万</text>";}
+  for(let a=Math.ceil(x0);a<=Math.floor(x1);a+=5){g+='<line x1="'+X(a)+'" y1="'+mt+'" x2="'+X(a)+'" y2="'+(H-mb)+'" stroke="#f2f4f7"/><text x="'+X(a)+'" y="'+(H-mb+16)+'" font-size="12" fill="#888" text-anchor="middle">'+a+"岁</text>";}
+  g+='<line x1="'+ml+'" y1="'+Y(0)+'" x2="'+(W-mr)+'" y2="'+Y(0)+'" stroke="#bbb" stroke-width="1.2"/>';
+  show.forEach(([k,c,n])=>{const mod=k==="0,0"?baseMod:pick[k];
+    const s=cumSeries(p,mod,MODE,baseMod);
+    const d=s.map((pt,i)=>(i?"L":"M")+X(pt[0]).toFixed(1)+" "+Y(pt[1]).toFixed(1)).join("");
+    g+='<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="2"/>';});
+  const ds=cumSeries(p,sel.mod,MODE,baseMod);
+  const dd=ds.map((pt,i)=>(i?"L":"M")+X(pt[0]).toFixed(1)+" "+Y(pt[1]).toFixed(1)).join("");
+  g+='<path d="'+dd+'" fill="none" stroke="#000" stroke-width="2.4" stroke-dasharray="7 5"/>';
+  const rIdx=(sel.mod.retireIdx-ym(p.birthY,p.birthM))/12;
+  g+='<line x1="'+X(rIdx)+'" y1="'+mt+'" x2="'+X(rIdx)+'" y2="'+(H-mb)+'" stroke="#1a2b4a" stroke-dasharray="3 4" opacity=".6"/><text x="'+X(rIdx)+'" y="'+(mt+12)+'" font-size="12" fill="#1a2b4a" text-anchor="middle">退休 '+rIdx.toFixed(1)+"岁</text>";
+  svg.innerHTML=g;
+  $("legend").innerHTML=show.map(([k,c,n])=>"<span><i style='background:"+c+"'></i>"+n+"</span>").join("")+"<span><i style='background:#000;height:0;border-top:2px dashed #000'></i>主方案</span>";
+}
+function setMode(m){if(LAST&&LAST.p.pathMode==="pure"&&m==="delta")return;MODE=m;$("tabDelta").className=m==="delta"?"on":"";$("tabLife").className=m==="life"?"on":"";renderChart();renderDetail();}
+function showPage(id,btn){
+  const tabs=btn.parentNode.children;
+  for(let i=0;i<tabs.length;i++)tabs[i].className="";
+  btn.className="on";
+  ["p1","p2","p3"].forEach(p=>{const e=$(p);if(e&&e.style)e.style.display=p===id?"":"none";});
+}
+function renderDetailSel(){
+  const {rows}=LAST;const nm=a=>a===0?"不缴":(a*100)+"%";
+  $("detailSel").innerHTML=rows.map(r=>"<option value='"+r.a+","+r.b+"'>"+nm(r.a)+" / "+nm(r.b)+"（月领 "+r.mod.pension.toFixed(0)+"）</option>").join("");
+  $("detailSel").value=LAST.p.tierA+","+LAST.p.tierB;
+}
+function renderDetail(){
+  const {p,baseMod,rows}=LAST;
+  const [a,b]=$("detailSel").value.split(",").map(Number);
+  const mod=rows.find(r=>r.a===a&&r.b===b).mod;
+  const head="<tr><th>年份</th><th>个人缴费(元)</th><th>年末账户(万)</th><th>月养老金(元)</th><th>当年领取(元)</th><th>累计净额("+ (MODE==="delta"?"增量":"全周期") +",万)</th></tr>";
+  const byYear={};
+  mod.months.forEach(r=>{const o=byYear[r.y]||(byYear[r.y]={pay:0,bal:null,pension:null,got:0});if(r.pay)o.pay+=r.base*r.personalRate*(r.kind==="job"?(p.inclEr?0.24:0.08):1);if(r.bal!=null)o.bal=r.bal;});
+  let cum=0;
+  const dieIdx=ym(p.birthY,p.birthM)+Math.round(p.dieAge*12);
+  const startY=ymOf(mod.months[0].idx)[0];
+  for(let y=startY;y<=ymOf(dieIdx)[0];y++){
+    const o=byYear[y]||(byYear[y]={pay:0,bal:null,pension:null,got:0});
+    if(y>ymOf(mod.retireIdx)[0]){o.pension=mod.pension*adjFactor(p,mod,y);o.got=o.pension*12;}
+    const cost=o.pay;
+    if(MODE==="delta"&&y>ymOf(mod.retireIdx)[0]){const baseP=baseMod.pension*adjFactor(p,baseMod,y);o.got=(o.pension-baseP)*12;}
+    if(MODE==="delta"&&y<=ymOf(mod.retireIdx)[0])o.got=0;
+    cum+=o.got-cost;
+    o.cum=cum;
+  }
+  const body=Object.keys(byYear).map(y=>{const o=byYear[y];
+    return "<tr><td>"+y+"</td><td class='"+(o.pay?"neg":"")+"'>"+(o.pay?(-o.pay).toFixed(0):"—")+"</td><td>"+(o.bal!=null?fmtW(o.bal):"—")+"</td><td>"+(o.pension!=null?o.pension.toFixed(0):"—")+"</td><td class='"+(o.got?"pos":"")+"'>"+(o.got?o.got.toFixed(0):"—")+"</td><td class='"+(o.cum>=0?"pos":"neg")+"'>"+(o.cum/10000).toFixed(1)+"</td></tr>";}).join("");
+  $("detail").innerHTML=head+body;
+}
+const FIDS=["sex","birth","line","flexEarly","flexLate","start","acctBal","acctAsOf","gaps","baseTable","unemp","unempDur","tierA","tierB","subsidy","subsidyMode","applyMode","gWage","rAcct","gAdj","dieAge","zeroIdx","inclEr","socTable","cbTable","pathMode"];
+FIDS.forEach(id=>{
+  $(id).addEventListener("input",()=>{recalc();saveLocal();});$(id).addEventListener("change",()=>{recalc();saveLocal();});});
+$("detailSel").addEventListener("change",renderDetail);
+function saveLocal(){try{const o={};FIDS.forEach(id=>{const e=$(id);o[id]=(e.type==="checkbox")?e.checked:e.value;});localStorage.setItem("ylApp.v1",JSON.stringify(o));}catch(e){}}
+function loadLocal(){try{return JSON.parse(localStorage.getItem("ylApp.v1")||"null");}catch(e){return null;}}
+function applyVals(o){FIDS.forEach(id=>{const e=$(id);if(!(id in o))return;if(e.type==="checkbox")e.checked=!!o[id];else e.value=o[id];});}
+function saveProfile(){
+  const p={};FIDS.forEach(id=>{const e=$(id);p[id]=(e.type==="checkbox")?e.checked:e.value;});
+  const o={"应用":"养老有方","类型":"个人档案","版本":1,"导出时间":new Date().toISOString().slice(0,10),
+    "说明":"在'养老有方'App【基础信息】页点〔载入档案文件〕选本文件，即可恢复全部参数。文件只含自己填的数字，可发微信、传手机、存网盘。","参数":p};
+  try{
+    const blob=new Blob([JSON.stringify(o,null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download="养老有方档案-"+o["导出时间"]+".json";
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }catch(e){alert("保存失败："+e.message);}
+}
+$("saveProfile").addEventListener("click",saveProfile);
+$("loadProfileBtn").addEventListener("click",()=>$("loadFile").click());
+$("loadFile").addEventListener("change",function(){const f=this.files&&this.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result);const p=(o&&o["参数"])?o["参数"]:o;applyVals(p);recalc();saveLocal();}catch(e){alert("档案文件读不出来，请确认是从本App导出的 .json 文件。\n"+e.message);}};
+  r.readAsText(f,"utf-8");this.value="";
+});
+const DEF=(function(){const o={};FIDS.forEach(id=>{const e=$(id);o[id]=(e.type==="checkbox")?e.checked:e.value;});return o;})();
+$("resetBtn").addEventListener("click",()=>{if(confirm("恢复默认参数？当前填写的内容会被清掉（不影响已保存的档案文件）。")){applyVals(DEF);recalc();saveLocal();}});
+const _sv=loadLocal();if(_sv)applyVals(_sv);
+recalc();saveLocal();
+</script>
+</body>
+</html>
