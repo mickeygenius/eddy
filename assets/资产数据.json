@@ -1,0 +1,58 @@
+{
+ "app": "资产台账",
+ "savedAt": "2026-11-24T12:00:00.000Z",
+ "items": [
+  {
+   "id": "s1",
+   "name": "Matepad Air 2025柔光版",
+   "cat": "数码",
+   "brand": "华为",
+   "status": "服役中",
+   "buyDate": "2026-05-20",
+   "price": 2249,
+   "channel": "京东",
+   "endDate": "",
+   "recycle": null,
+   "note": "赠送一年延保和一年碎屏保"
+  },
+  {
+   "id": "s2",
+   "name": "Z11 Turbo",
+   "cat": "数码",
+   "brand": "IQOO",
+   "status": "服役中",
+   "buyDate": "2026-05-18",
+   "price": 1996,
+   "channel": "淘宝",
+   "endDate": "",
+   "recycle": null,
+   "note": ""
+  },
+  {
+   "id": "s3",
+   "name": "Z11 Turbo",
+   "cat": "数码",
+   "brand": "IQOO",
+   "status": "服役中",
+   "buyDate": "2026-03-06",
+   "price": 2124,
+   "channel": "京东",
+   "endDate": "",
+   "recycle": null,
+   "note": "送蓝牙耳机"
+  },
+  {
+   "id": "s4",
+   "name": "Z11 Turbo",
+   "cat": "数码",
+   "brand": "IQOO",
+   "status": "服役中",
+   "buyDate": "2026-03-06",
+   "price": 2124,
+   "channel": "京东",
+   "endDate": "",
+   "recycle": null,
+   "note": "送蓝牙耳机"
+  }
+ ]
+}
