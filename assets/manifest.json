@@ -1,20 +1,20 @@
 {
- "name": "海阔天空",
- "short_name": "海阔",
- "start_url": "https://mickeygenius.github.io/connie/university/",
- "scope": "https://mickeygenius.github.io/connie/university/",
+ "name": "心中有数",
+ "short_name": "心中有数",
+ "start_url": "https://mickeygenius.github.io/eddy/assets/",
+ "scope": "https://mickeygenius.github.io/eddy/assets/",
  "display": "standalone",
- "background_color": "#f1f5f9",
- "theme_color": "#7c3aed",
+ "background_color": "#faf6f1",
+ "theme_color": "#c2410c",
  "icons": [
   {
-   "src": "https://mickeygenius.github.io/connie/university/icon-192.png",
+   "src": "https://mickeygenius.github.io/eddy/assets/icon-192.png",
    "sizes": "192x192",
    "type": "image/png",
    "purpose": "any"
   },
   {
-   "src": "https://mickeygenius.github.io/connie/university/icon-512.png",
+   "src": "https://mickeygenius.github.io/eddy/assets/icon-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "any"
